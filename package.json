@@ -1,0 +1,61 @@
+{
+  "name": "@startupbros/pi-background-services",
+  "version": "0.1.0",
+  "description": "Robust background service orchestration for Pi.",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "pi-extension",
+    "pi-coding-agent",
+    "background-services",
+    "process-supervision",
+    "service-readiness",
+    "developer-tools"
+  ],
+  "type": "module",
+  "files": [
+    "extensions/",
+    "src/",
+    "test/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "tsconfig.json"
+  ],
+  "pi": {
+    "extensions": [
+      "./extensions/index.ts"
+    ]
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test test/**/*.test.ts",
+    "check": "pnpm typecheck && pnpm test",
+    "prepublishOnly": "pnpm check"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "packageManager": "pnpm@10.26.2",
+  "peerDependencies": {
+    "@mariozechner/pi-coding-agent": "*",
+    "@sinclair/typebox": "*"
+  },
+  "devDependencies": {
+    "@mariozechner/pi-coding-agent": "^0.58.0",
+    "@sinclair/typebox": "^0.34.41",
+    "@types/node": "^24.3.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StartupBros/pi-background-services.git"
+  },
+  "bugs": {
+    "url": "https://github.com/StartupBros/pi-background-services/issues"
+  },
+  "homepage": "https://github.com/StartupBros/pi-background-services#readme",
+  "author": "StartupBros",
+  "license": "MIT"
+}
