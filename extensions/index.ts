@@ -15,9 +15,9 @@ import {
 	stopService,
 	trimOutput,
 	writeServiceMeta,
-} from "../src/services.js";
-import { loadConfig } from "../src/config.js";
-import { getServiceLaunchGuardMessage, looksLikeServiceTask } from "../src/patterns.js";
+} from "../src/services.ts";
+import { loadConfig } from "../src/config.ts";
+import { getServiceLaunchGuardMessage, looksLikeServiceTask } from "../src/patterns.ts";
 
 const START_TOOL_PARAMS = Type.Object({
 	label: Type.Optional(Type.String({ description: "Short label for log/pid directory naming." })),
