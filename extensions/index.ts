@@ -67,14 +67,48 @@ type StopToolParams = {
 	killWaitMs?: number;
 };
 
+export function extractReferencedShellScript(command: string): string | null {
+	const trimmed = command.trim();
+	const bashMatch = trimmed.match(/^(?:env\s+)?(?:bash|sh)(?:\s+-[\w-]+)*\s+([^\s;&|]+\.sh)\b/m);
+	if (bashMatch?.[1]) return bashMatch[1];
+	const directMatch = trimmed.match(/^(\.\/[^\s;&|]+\.sh|\/[^\s;&|]+\.sh)\b/m);
+	if (directMatch?.[1]) return directMatch[1];
+	return null;
+}
+
 export default function backgroundServicesExtension(pi: ExtensionAPI) {
+	const state = globalThis as typeof globalThis & {
+		__startupbrosPiBackgroundServicesLoaded?: boolean;
+	};
+	if (state.__startupbrosPiBackgroundServicesLoaded) {
+		return;
+	}
+	state.__startupbrosPiBackgroundServicesLoaded = true;
+
 	const config = loadConfig();
 
 	if (config.guardMode !== "off") {
 		pi.on("tool_call", async (event, ctx) => {
 			if (event.toolName !== "bash") return;
 			const command = typeof event.input?.command === "string" ? event.input.command : "";
-			const reason = getServiceLaunchGuardMessage(command);
+			let reason = getServiceLaunchGuardMessage(command);
+
+			if (!reason) {
+				const referencedScript = extractReferencedShellScript(command);
+				if (referencedScript) {
+					const resolvedScript = resolvePath(referencedScript, ctx.cwd);
+					try {
+						const scriptContents = await fs.readFile(resolvedScript, "utf8");
+						reason = getServiceLaunchGuardMessage(scriptContents);
+						if (reason) {
+							reason = `${reason}\n\nReferenced script: ${resolvedScript}`;
+						}
+					} catch {
+						// Ignore missing/unreadable referenced scripts and fall back to normal handling.
+					}
+				}
+			}
+
 			if (!reason) return;
 			if (config.guardMode === "warn") {
 				ctx.ui.notify(`Background services: ${reason}`, "warning");
