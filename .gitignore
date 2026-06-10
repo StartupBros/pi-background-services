@@ -2,3 +2,6 @@ node_modules/
 .DS_Store
 *.log
 coverage/
+
+# Claude Code parallel worktrees
+.claude/worktrees/
